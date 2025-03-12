@@ -16,10 +16,8 @@ class RoomController extends Controller
         return response()->json(Room::all());
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'name' => 'required|max:255|unique:rooms',
@@ -28,6 +26,14 @@ class RoomController extends Controller
         ]);
 
         return Room::create($validated);
+        return response()->json($room, 201);
+    }
+
+    public function destroy($id)
+    {
+        $room = Room::findOrFail($id);
+        $room->delete();
+        return response()->json(['message' => 'Ruangan berhasil dihapus!']);
     }
 
     /**

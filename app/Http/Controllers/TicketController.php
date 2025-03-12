@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Ticket;
 
 class TicketController extends Controller
 {
@@ -36,7 +37,16 @@ class TicketController extends Controller
             'status' => 'approved',
             'approved_by' => auth()->id()
         ]);
-        return response()->json(['message' => 'Permintaan disetujui!']);
+        return response()->json(['message' => 'Tiket berhasil disetujui!']);
     }
 
+    public function deny(Ticket $ticket)
+    {
+        $this->authorize('deny', $ticket);
+        $ticket->update([
+            'status' => 'denied',
+            'approved_by' => auth()->id()
+        ]);
+        return response()->json(['message' => 'Tiket berhasil ditolak!']);
+    }
 }

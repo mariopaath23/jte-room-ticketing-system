@@ -29,8 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Admin-specific route
     Route::middleware(RoleMiddleware::class . ':admin')->group(function(){
-      Route::post('/rooms', [RoomController::class, 'create']);
+      Route::post('/rooms', [RoomController::class, 'store']);
       Route::patch('/tickets/{ticket}/approve', [TicketController::class, 'approve'])->middleware('can:approve,ticket');
+      Route::patch('/tickets/{ticket}/deny', [TicketController::class, 'deny'])->middleware('can:deny,ticket');
     });
 
     Route::middleware(RoleMiddleware::class . ':superadmin')->group(function () {

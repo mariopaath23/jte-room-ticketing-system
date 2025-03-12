@@ -57,4 +57,11 @@ class AuthController extends Controller
         $request->user()->tokens()->delete();
         return response()->json(['message' => 'Berhasil Log Out']);
     }
+
+    public function deleteUser($id)
+    {
+        $user= User::findOrFail($id);
+        $user->delete();
+        return response() -> json(['message' => 'User berhasil dihapus!']);
+    }
 }
