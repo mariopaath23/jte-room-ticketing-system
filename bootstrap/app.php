@@ -14,7 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->api(prepend: [
-            EnsureFrontendRequestsAreStateful::class, // Properly adding Sanctum Middleware
+            EnsureFrontendRequestsAreStateful::class,
+        ]);
+
+        $middleware->alias([
+            'roles' => \app\Http\Middleware\RoleMiddleware::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

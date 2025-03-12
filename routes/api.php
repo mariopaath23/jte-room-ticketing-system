@@ -5,27 +5,36 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AuthController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
-
-  // Authentication Routes
-Route::post('/register', [AuthController::class, 'register']);
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+use App\Http\Middleware\RoleMiddleware;
 
 // Public Routes
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
 Route::get('/rooms', [RoomController::class, 'index']);
 Route::get('/rooms/{id}', [RoomController::class, 'show']);
 Route::get('/schedule', [TicketController::class, 'schedule']);
 
-// Protected Routes (Requires Authentication)
+// Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user', function (Request $request) {
-        return $request->user();
+        return response()->json($request->user());
     });
 
-    Route::post('/tickets', [TicketController::class, 'store']);
-    Route::post('/rooms', [RoomController::class, 'create']);
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
 
-    // Admin-specific route
-    Route::patch('/tickets/{ticket}/approve', [TicketController::class, 'approve'])->middleware('can:approve,ticket');
+    //Student-specific route
+    Route::middleware(RoleMiddleware::class . ':student')->group(function(){
+      Route::post('/tickets', [TicketController::class, 'store']);
+    });
+
+    //Admin-specific route
+    Route::middleware(RoleMiddleware::class . ':admin')->group(function(){
+      Route::post('/rooms', [RoomController::class, 'create']);
+      Route::patch('/tickets/{ticket}/approve', [TicketController::class, 'approve'])->middleware('can:approve,ticket');
+    });
+
+    Route::middleware(RoleMiddleware::class . ':superadmin')->group(function () {
+      Route::delete('/rooms/{id}', [RoomController::class, 'destroy']);
+      Route::delete('/users/{id}', [AuthController::class, 'deleteUser']);
+    });
 });
